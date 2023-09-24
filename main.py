@@ -28,7 +28,7 @@ def on_startup():
     init_database()
 
 
-@app.get("/", response_class=RedirectResponse)
+@app.get("/", response_class=RedirectResponse, include_in_schema=False)
 async def redirect_to_docs():
     return "/docs"
 
