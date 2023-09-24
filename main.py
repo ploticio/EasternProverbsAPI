@@ -1,8 +1,8 @@
 from typing import List, Annotated
 from fastapi import FastAPI, Depends, HTTPException, Query
-from sqlmodel import Session, select, or_
+from sqlmodel import Session, select, or_, func
 from database import engine
-from models import Proverb, Tag, ProverbTagLink, Language, Topic
+from models import Proverb, Tag, ProverbTagLink, Language, Topic, ProverbWithTags
 
 app = FastAPI(
     title="Eastern Proverbs API",
@@ -18,7 +18,7 @@ def get_session():
 
 @app.get(
     "/proverbs/",
-    response_model=List[Proverb],
+    response_model=List[ProverbWithTags],
     tags=["Fetch Data"],
     summary="Fetch proverbs.",
 )
@@ -41,12 +41,32 @@ def get_proverbs(
         query = query.where(Proverb.language == lang)
 
     results = session.exec(query).all()
-    return results
+
+    proverbs = []
+    for result in results:
+        topicProverb = ProverbWithTags.from_orm(result)
+        setattr(topicProverb, "topics", [tags.topic for tags in result.tags])
+        proverbs.append(topicProverb)
+
+    return proverbs
+
+
+@app.get(
+    "/proverbs/random",
+    response_model=ProverbWithTags,
+    tags=["Fetch Data"],
+    summary="Fetch a random proverb.",
+)
+def get_random_proverb(*, session: Session = Depends(get_session)):
+    proverb = session.exec(select(Proverb).order_by(func.random())).first()
+    comp_proverb = ProverbWithTags.from_orm(proverb)
+    setattr(comp_proverb, "topics", [tags.topic for tags in proverb.tags])
+    return comp_proverb
 
 
 @app.get(
     "/proverbs/{proverb_id}",
-    response_model=Proverb,
+    response_model=ProverbWithTags,
     tags=["Fetch Data"],
     summary="Fetch a proverb by id.",
 )
@@ -54,4 +74,6 @@ def get_proverb_by_id(*, session: Session = Depends(get_session), proverb_id: in
     proverb = session.get(Proverb, proverb_id)
     if not proverb:
         raise HTTPException(status_code=404, detail="Proverb not found.")
-    return proverb
+    comp_proverb = ProverbWithTags.from_orm(proverb)
+    setattr(comp_proverb, "topics", [tags.topic for tags in proverb.tags])
+    return comp_proverb

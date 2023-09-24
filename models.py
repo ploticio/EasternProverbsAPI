@@ -54,3 +54,7 @@ class Tag(SQLModel, table=True):
     proverbs: List[Proverb] = Relationship(
         back_populates="tags", link_model=ProverbTagLink
     )
+
+
+class ProverbWithTags(Proverb):
+    topics: List[str] = []
