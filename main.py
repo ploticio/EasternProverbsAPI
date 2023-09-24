@@ -5,10 +5,13 @@ from sqlmodel import Session, select, or_, func
 from database import engine, init_database
 from models import Proverb, Tag, ProverbTagLink, Language, Topic, ProverbWithTags
 
+description = "# Eastern Proverbs API ⛩️ \n\nPublic REST API that has collection of various proverbs from Asia. Find the wisdom & inspiration to keep you going throughout the day.\n\nFind the source code [here](https://github.com/ploticio/EasternProverbsAPI)"
+
 app = FastAPI(
     title="Eastern Proverbs API",
     version="1.0.0",
-    summary="A collection of various proverbs from Asia",
+    summary="A collection of various proverbs from Asia.",
+    description=description,
 )
 
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["GET"])
