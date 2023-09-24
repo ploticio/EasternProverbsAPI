@@ -1,5 +1,6 @@
 from typing import List, Annotated
 from fastapi import FastAPI, Depends, HTTPException, Query
+from fastapi.middleware.cors import CORSMiddleware
 from sqlmodel import Session, select, or_, func
 from database import engine
 from models import Proverb, Tag, ProverbTagLink, Language, Topic, ProverbWithTags
@@ -9,6 +10,8 @@ app = FastAPI(
     version="1.0.0",
     summary="A collection of various proverbs from Asia",
 )
+
+app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["GET"])
 
 
 def get_session():
