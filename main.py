@@ -1,5 +1,6 @@
 from typing import List, Annotated
 from fastapi import FastAPI, Depends, HTTPException, Query
+from fastapi.responses import RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 from sqlmodel import Session, select, or_, func
 from database import engine, init_database
@@ -25,6 +26,11 @@ def get_session():
 @app.on_event("startup")
 def on_startup():
     init_database()
+
+
+@app.get("/", response_class=RedirectResponse)
+async def redirect_to_docs():
+    return "/docs"
 
 
 @app.get(
