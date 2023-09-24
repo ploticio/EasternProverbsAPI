@@ -2,7 +2,7 @@ from typing import List, Annotated
 from fastapi import FastAPI, Depends, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from sqlmodel import Session, select, or_, func
-from database import engine
+from database import engine, init_database
 from models import Proverb, Tag, ProverbTagLink, Language, Topic, ProverbWithTags
 
 app = FastAPI(
@@ -17,6 +17,11 @@ app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["GET"])
 def get_session():
     with Session(engine) as session:
         yield session
+
+
+@app.on_event("startup")
+def on_startup():
+    init_database()
 
 
 @app.get(
