@@ -17,8 +17,8 @@ class Language(str, Enum):
 class Topic(str, Enum):
     family = "Family"
     knowledge = "Knowledge"
-    Culture = "Culture"
-    preserverence = "Preserverence"
+    culture = "Culture"
+    perseverance = "Perseverance"
     wealth = "Wealth"
     love = "Love"
     patience = "Patience"
